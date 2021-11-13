@@ -3,6 +3,7 @@ import 'package:achieve_takehome_test/providers/AssetsProvider.dart';
 import 'package:achieve_takehome_test/services/ApiService.dart';
 import 'package:achieve_takehome_test/services/serviceFactory.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
           cardTheme: CardTheme(elevation: 0.5),
           brightness: Brightness.light,
           appBarTheme: AppBarTheme(
-            brightness: Brightness.dark,
+            systemOverlayStyle:SystemUiOverlayStyle.dark,
             color: Colors.black,
             iconTheme: IconThemeData(color: Colors.white),
           ),

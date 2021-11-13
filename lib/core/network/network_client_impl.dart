@@ -9,7 +9,7 @@ class NetworkClientImpl implements NetworkClient<http.Response> {
     String url, {
     Map<String, String> headers = const {},
   }) {
-    return http.get(url, headers: headers);
+    return http.get(Uri.parse(url), headers: headers);
   }
 
   @override
@@ -19,7 +19,7 @@ class NetworkClientImpl implements NetworkClient<http.Response> {
     dynamic body,
   }) {
     return http.post(
-      url,
+      Uri.parse(url),
       body: body,
       headers: headers,
     );
@@ -32,7 +32,7 @@ class NetworkClientImpl implements NetworkClient<http.Response> {
     dynamic body,
   }) {
     return http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: body is Map ? json.encode(body) : body,
     );
@@ -45,7 +45,7 @@ class NetworkClientImpl implements NetworkClient<http.Response> {
     body,
   }) {
     return http.patch(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: body is Map ? json.encode(body) : body,
     );
@@ -57,7 +57,7 @@ class NetworkClientImpl implements NetworkClient<http.Response> {
     Map<String, String> headers = const {},
   }) {
     return http.delete(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
   }
