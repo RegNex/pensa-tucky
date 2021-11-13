@@ -30,15 +30,31 @@ class AssetsProvider extends BaseProvider<AssetsProviderEvent> {
     addEvent(AssetsProviderEvent(state: ProviderState.LOADING));
 
     try {
-      /// TODO: Fetch assets from Coinbase
+      /// TODO: Fetch assets from Coinbase - DONE
 
-      _apiService
-          .getCoinCapAssets(page: offset, search: search)
+      await _apiService
+          .getCoinCapAssets(
+        page: offset,
+        search: search,
+      )
           .then((response) {
         if (response.statusCode == 200) {
           CoinCapAsset _coinCapAsset = coinCapAssetFromJson(response.body);
-          addEvent(AssetsProviderEvent<CoinCapAsset>(
-              state: ProviderState.SUCCESS, data: _coinCapAsset));
+          print(_coinCapAsset.data.length);
+
+          int _limit = limit + 1;
+
+          if (_limit <= _coinCapAsset.data.length) {
+            print('here');
+            addEvent(AssetsProviderEvent<List<Map<String, String>>>(
+                state: ProviderState.SUCCESS,
+                data: _coinCapAsset.data.getRange(0, _limit).toList()));
+          } else {
+            print('there');
+
+            addEvent(AssetsProviderEvent<List<Map<String, String>>>(
+                state: ProviderState.SUCCESS, data: _coinCapAsset.data));
+          }
         } else {
           addEvent(AssetsProviderEvent(
               state: ProviderState.ERROR, data: response.body));
