@@ -1,5 +1,9 @@
 # Achieve Take-Home Test Specification
 
+### Run App
+- To run the app using coincap API KEY, ```flutter run --dart-define=API_KEY=<YOUR-API-KEY-HERE>```
+- To run without coincap API KEY, ```flutter run```
+
 ### Goal
 
 In this repository, you'll find a flutter application that allows a user to view assets eg: bitcoin, ethereum, cardano etc. and also search for a text string using the [CoinCap REST API](https://docs.coincap.io/#ee30bea9-bb6b-469d-958a-d3e35d442d7a). In it's current state, however, the app is just a rough prototype
