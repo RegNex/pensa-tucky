@@ -1,3 +1,4 @@
+import 'package:achieve_takehome_test/core/data/coinbase_asset.dart';
 import 'package:achieve_takehome_test/providers/BaseProvider.dart';
 import 'package:achieve_takehome_test/services/ApiService.dart';
 import 'package:achieve_takehome_test/utils/network_error.dart';
@@ -31,7 +32,18 @@ class AssetsProvider extends BaseProvider<AssetsProviderEvent> {
     try {
       /// TODO: Fetch assets from Coinbase
 
-      addEvent(AssetsProviderEvent(state: ProviderState.SUCCESS));
+      _apiService
+          .getCoinCapAssets(page: offset, search: search)
+          .then((response) {
+        if (response.statusCode == 200) {
+          CoinCapAsset _coinCapAsset = coinCapAssetFromJson(response.body);
+          addEvent(AssetsProviderEvent<CoinCapAsset>(
+              state: ProviderState.SUCCESS, data: _coinCapAsset));
+        } else {
+          addEvent(AssetsProviderEvent(
+              state: ProviderState.ERROR, data: response.body));
+        }
+      });
     } on NetworkError catch (e) {
       addEvent(AssetsProviderEvent<NetworkError>(
         state: ProviderState.ERROR,
