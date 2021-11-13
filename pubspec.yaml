@@ -9,19 +9,19 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  provider: ^4.0.4
-  get_it: ^4.0.1
-  logger: ^0.9.1
-  cupertino_icons: ^1.0.0
-  http: ^0.12.2
-  cached_network_image: ^2.4.1
+  provider: ^6.0.1
+  get_it: ^7.2.0
+  logger: ^1.1.0
+  cupertino_icons: ^1.0.4
+  http: ^0.13.4
+  cached_network_image: ^3.1.0+1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner: ^1.11.0
-  mockito: ^4.1.1
-  environment_config: ^2.2.5
+  build_runner: ^2.1.5
+  mockito: ^5.0.16
+  environment_config: ^3.0.0
 
 flutter:
   uses-material-design: true
