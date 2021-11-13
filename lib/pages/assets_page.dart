@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:achieve_takehome_test/core/data/coin.dart';
 import 'package:achieve_takehome_test/providers/AssetsProvider.dart';
 import 'package:achieve_takehome_test/providers/BaseProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class AssetsPage extends StatefulWidget {
@@ -12,11 +14,27 @@ class AssetsPage extends StatefulWidget {
 
 class _AssetsPageState extends State<AssetsPage> {
   final _searchTextEditingController = TextEditingController();
-
+  final ScrollController _scrollController = ScrollController();
   Timer _searchDebounce;
   AssetsProvider _assetsProvider;
+  int limit = 30;
 
-  void onSearchQueryChanged(String search) {}
+  void onSearchQueryChanged(String search) {
+    if (search != null) {
+      if (_searchDebounce != null) {
+        _searchDebounce.cancel();
+        setState(() {
+          _searchDebounce = Timer(Duration(seconds: 2), () {
+            if (search.length > 2) {
+              _assetsProvider.fetchAssets(search: search);
+            }
+          });
+        });
+      }
+    } else {
+      _assetsProvider.fetchAssets();
+    }
+  }
 
   void didBuild(BuildContext context) {
     _assetsProvider.fetchAssets();
@@ -29,6 +47,23 @@ class _AssetsPageState extends State<AssetsPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       didBuild(context);
     });
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        _getMoreData();
+      }
+    });
+  }
+
+  _getMoreData() {
+    print('at bottom');
+    setState(() {
+      limit = limit + limit;
+    });
+    // present = present + 1;
+    // perPage = perPage + perPage;
+    _assetsProvider.fetchAssets(limit: limit);
   }
 
   @override
@@ -45,24 +80,12 @@ class _AssetsPageState extends State<AssetsPage> {
         return Scaffold(
           appBar: AppBar(
             centerTitle: true,
-            actions: [
-              if (_isLoading)
-                Container(
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(),
-                  ),
-                ),
-            ],
             bottom: PreferredSize(
               preferredSize: Size.fromHeight(70),
               child: ValueListenableBuilder(
                 valueListenable: _searchTextEditingController,
                 builder: (context, textVal, _) {
-                  final _text = textVal.text;
+                  final String _text = textVal.text;
 
                   return Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -108,18 +131,69 @@ class _AssetsPageState extends State<AssetsPage> {
               child: Image.asset('assets/img/coin-cap.png'),
             ),
           ),
-          body: RefreshIndicator(
-            onRefresh: () {
-              return _assetsProvider.fetchAssets(refresh: true);
-            },
-            child: Builder(
-              builder: (context) {
-                /// TODO: Rework this to show fetched Assets
-
-                return Center(
-                  child: Text('Fetch & Show Assets'),
-                );
+          body: SafeArea(
+            child: RefreshIndicator(
+              onRefresh: () {
+                return _assetsProvider.fetchAssets(refresh: true);
               },
+              child: Builder(
+                builder: (context) {
+                  /// TODO: Rework this to show fetched Assets
+
+                  if (_isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (snapshot.data?.state == ProviderState.ERROR &&
+                      snapshot.data?.data != null) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error,
+                          color: Colors.red,
+                        ),
+                        Text('${snapshot.data.data}'),
+                      ],
+                    );
+                  }
+
+                  if (!_isLoading &&
+                      snapshot.data?.state == ProviderState.SUCCESS &&
+                      snapshot.data?.data != null) {
+                    return ListView.separated(
+                        shrinkWrap: true,
+                        controller: _scrollController,
+                        itemBuilder: (context, index) {
+                          if (index == snapshot.data.data.length) {
+                            return Center(
+                                child: CircularProgressIndicator.adaptive());
+                          }
+                          Coin coin = Coin.fromJson(snapshot.data.data[index]);
+                          return ListTile(
+                            leading: Text('${index + 1}'),
+                            title: Text('${coin.name}'),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Market Cap.:'),
+                                Text('${coin.marketCapUsd}'),
+                              ],
+                            ),
+                            trailing: Text(
+                                '${NumberFormat.currency(name: 'US\$', decimalDigits: 2).format(double.parse(coin.priceUsd))}'),
+                          );
+                        },
+                        separatorBuilder: (__, _) => Divider(),
+                        itemCount: snapshot.data.data.length);
+                  }
+
+                  return Center(
+                    child: Text('Fetch & Show Assets'),
+                  );
+                },
+              ),
             ),
           ),
         );
@@ -131,6 +205,7 @@ class _AssetsPageState extends State<AssetsPage> {
   void dispose() {
     _searchTextEditingController.dispose();
     _searchDebounce?.cancel();
+    _assetsProvider?.dispose();
     super.dispose();
   }
 }
