@@ -40,21 +40,8 @@ class AssetsProvider extends BaseProvider<AssetsProviderEvent> {
           .then((response) {
         if (response.statusCode == 200) {
           CoinCapAsset _coinCapAsset = coinCapAssetFromJson(response.body);
-          print(_coinCapAsset.data.length);
-
-          int _limit = limit + 1;
-
-          if (_limit <= _coinCapAsset.data.length) {
-            print('here');
-            addEvent(AssetsProviderEvent<List<Map<String, String>>>(
-                state: ProviderState.SUCCESS,
-                data: _coinCapAsset.data.getRange(0, _limit).toList()));
-          } else {
-            print('there');
-
-            addEvent(AssetsProviderEvent<List<Map<String, String>>>(
-                state: ProviderState.SUCCESS, data: _coinCapAsset.data));
-          }
+          addEvent(AssetsProviderEvent<List<Map<String, String>>>(
+              state: ProviderState.SUCCESS, data: _coinCapAsset.data));
         } else {
           addEvent(AssetsProviderEvent(
               state: ProviderState.ERROR, data: response.body));
