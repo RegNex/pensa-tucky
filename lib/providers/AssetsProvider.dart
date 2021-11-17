@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:achieve_takehome_test/core/data/coin.dart';
 import 'package:achieve_takehome_test/core/data/coinbase_asset.dart';
 import 'package:achieve_takehome_test/providers/BaseProvider.dart';
 import 'package:achieve_takehome_test/services/ApiService.dart';
@@ -39,8 +42,8 @@ class AssetsProvider extends BaseProvider<AssetsProviderEvent> {
       )
           .then((response) {
         if (response.statusCode == 200) {
-          CoinCapAsset _coinCapAsset = coinCapAssetFromJson(response.body);
-          addEvent(AssetsProviderEvent<List<Map<String, String>>>(
+          CoinCapAsset _coinCapAsset = CoinCapAsset.fromJson(json.decode(response.body));
+          addEvent(AssetsProviderEvent<List<Coin>>(
               state: ProviderState.SUCCESS, data: _coinCapAsset.data));
         } else {
           addEvent(AssetsProviderEvent(
