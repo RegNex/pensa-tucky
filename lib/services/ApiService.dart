@@ -19,17 +19,14 @@ class ApiService {
     return ApiService._(client, baseUrl);
   }
 
-  Future<Response> getCoinCapAssets({
-    int page = 1,
-    String search,
-  }) async {
+  Future<Response> getCoinCapAssets({int page = 1, String search}) async {
     final _options = {
-      if (page != null) "page": page,
-      if (search != null) "search": search,
+      if (page != null) "offset": page,
+      if (search != null) "search": search
     };
 
     final _result = await _netClient.get('$_baseUrl?${encodeMap(_options)}',
-        headers: String.fromEnvironment('API_KEY') != null
+        headers: bool.hasEnvironment('API_KEY')
             ? {
                 'Accept-Encoding': 'gzip',
                 'Authorization': 'Bearer ${String.fromEnvironment('API_KEY')}'
@@ -42,7 +39,7 @@ class ApiService {
       throw NetworkError(_requestBody);
     }
 
-    /// TODO: Return the results
+    /// TODO: Return the results - DONE
     return _result;
   }
 }
